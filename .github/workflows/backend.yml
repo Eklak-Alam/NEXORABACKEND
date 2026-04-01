@@ -6,9 +6,6 @@ on:
   workflow_dispatch:
 
 jobs:
-  # ==========================================
-  # JOB 1: Check Code
-  # ==========================================
   check-code:
     runs-on: ubuntu-latest
     steps:
@@ -19,17 +16,15 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'npm'
+          # Removed the cache: 'npm' line because it requires package-lock.json
 
       - name: 📦 Install Dependencies
-        run: npm ci
+        # Changed 'npm ci' to 'npm install' because 'ci' also requires a lock file
+        run: npm install
 
       - name: 🧪 Run Tests
         run: npm run test --if-present 
 
-  # ==========================================
-  # JOB 2: Build & Push Docker Image
-  # ==========================================
   build-and-push:
     needs: check-code
     runs-on: ubuntu-latest
@@ -49,7 +44,7 @@ jobs:
       - name: 🚀 Build and Push Backend Image
         uses: docker/build-push-action@v5
         with:
-          context: . # Look in the ROOT
+          context: .
           push: true
           tags: |
             eklakalam/cloud-task-manager-backend:latest
